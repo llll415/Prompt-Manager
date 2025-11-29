@@ -12,7 +12,7 @@ def can_see_sensitive():
     """判断当前用户是否有权查看敏感内容"""
     if current_user.is_authenticated: return True
 
-    # 从数据库读取开关，确保持久化配置生效
+    # 修改点：从数据库读取开关 (持久化)
     allow_toggle = SystemSetting.get_bool('allow_sensitive_toggle', default=True)
 
     if not allow_toggle: return False
@@ -107,17 +107,18 @@ def upload():
     # 1. 获取用户选择的分类 (gallery 或 template)
     category = request.form.get('category', 'gallery')
 
-    # 2. 根据分类读取对应的持久化配置开关
+    # 2. 从数据库读取审核配置
     if category == 'template':
         need_approval = SystemSetting.get_bool('approval_template', default=True)
     else:
+        # 默认为 gallery
         need_approval = SystemSetting.get_bool('approval_gallery', default=True)
 
     # 3. 决定初始状态
     initial_status = 'pending' if need_approval else 'approved'
 
     try:
-        # 4. 构造表单数据副本以注入状态
+        # 构造表单数据复本以修改状态
         form_data = request.form.to_dict()
         form_data['status'] = initial_status
 
@@ -126,10 +127,7 @@ def upload():
             data=form_data,
             ref_files=request.files.getlist('ref_images')
         )
-
-        # 5. 渲染成功页面，传递状态以决定显示内容
         return render_template('success.html', status=initial_status, image=new_image)
-
     except Exception as e:
         current_app.logger.error(f"Upload Error: {e}")
         return f"发布失败: {str(e)}", 500
@@ -140,27 +138,45 @@ def about():
     return render_template('about.html')
 
 
-@bp.route('/api/list')
-def api_list():
-    """获取作品列表 API"""
+def _get_api_data(category_filter):
+    """
+    API 通用查询逻辑 (Internal Helper)
+    :param category_filter: 'gallery' 或 'template'
+    """
     page = request.args.get('page', 1, type=int)
-    per_page = min(request.args.get('per_page', 100, type=int), 1000)
-    category = request.args.get('category')
+    per_page = min(request.args.get('per_page', 20, type=int), 100)  # 默认每页20条
 
+    # 基础查询：只看已发布的
     query = Image.query.filter_by(status='approved')
 
-    if category:
-        query = query.filter_by(category=category)
+    # 强制分类筛选
+    if category_filter:
+        query = query.filter_by(category=category_filter)
 
+    # 排序：默认按时间倒序
     query = query.order_by(Image.created_at.desc())
+
+    # 分页执行
     pagination = query.paginate(page=page, per_page=per_page, error_out=False)
 
-    return jsonify({
+    return {
         'current_page': page,
         'pages': pagination.pages,
         'total': pagination.total,
         'data': [img.to_dict() for img in pagination.items]
-    })
+    }
+
+
+@bp.route('/api/gallery')
+def api_gallery_list():
+    """获取画廊数据 (JSON)"""
+    return jsonify(_get_api_data('gallery'))
+
+
+@bp.route('/api/templates')
+def api_templates_list():
+    """获取模板数据 (JSON)"""
+    return jsonify(_get_api_data('template'))
 
 
 @bp.route('/api/stats/view/<int:img_id>', methods=['POST'])

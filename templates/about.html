@@ -60,7 +60,7 @@
                     <div>
                         <h6 class="fw-bold mb-1">上传与记录</h6>
                         <p class="text-secondary small mb-0 line-height-sm">
-                            支持拖拽上传。对于 Img2Img 作品，可上传多张参考图并调整顺序。
+                            支持拖拽上传。对于 Img2Img 作品，可上传多张参考图并拖拽调整顺序。
                         </p>
                     </div>
                 </div>
@@ -113,23 +113,41 @@
         </div>
     </div>
 
-    <div class="animate-up" style="animation-delay: 0.3s;">
-        <h4 class="fw-bold art-title mb-4">开发者接口 (API)</h4>
+    <div class="glass-panel p-4 mb-5 animate-up" style="animation-delay: 0.3s;">
+        <h4 class="fw-bold art-title mb-4" style="font-size: 1.1rem;">开发者接口 (API)</h4>
 
-        <p class="text-secondary mb-3 small">
+        <p class="text-secondary mb-4 small">
             本系统提供标准的 HTTP <code>GET</code> 接口，返回 JSON 格式的作品数据，方便集成到其他工作流中。
         </p>
 
-        <div class="bg-light bg-opacity-50 rounded-3 p-3 border border-secondary border-opacity-10 mb-4 d-flex align-items-center shadow-sm">
-            <span class="badge bg-secondary me-3">GET</span>
-            <code class="text-dark fw-bold flex-grow-1 text-break" style="font-family: 'SF Mono', monospace;">
-                {{ url_for('public.api_list', _external=True) }}
-            </code>
-            <button class="btn btn-sm btn-outline-secondary border-0"
-                    onclick="navigator.clipboard.writeText('{{ url_for('public.api_list', _external=True) }}'); alert('地址已复制')"
-                    title="复制接口地址">
-                <i class="bi bi-clipboard"></i>
-            </button>
+        <div class="mb-4">
+            <h6 class="fw-bold small text-secondary text-uppercase ls-1 mb-2">1. 画廊数据 (Gallery)</h6>
+            <div class="bg-light bg-opacity-50 rounded-3 p-3 border border-secondary border-opacity-10 d-flex align-items-center shadow-sm">
+                <span class="badge bg-secondary me-3">GET</span>
+                <code class="text-dark fw-bold flex-grow-1 text-break" style="font-family: 'SF Mono', monospace;">
+                    {{ url_for('public.api_gallery_list', _external=True) }}
+                </code>
+                <button class="btn btn-sm btn-outline-secondary border-0"
+                        onclick="navigator.clipboard.writeText('{{ url_for('public.api_gallery_list', _external=True) }}'); alert('地址已复制')"
+                        title="复制接口地址">
+                    <i class="bi bi-clipboard"></i>
+                </button>
+            </div>
+        </div>
+
+        <div class="mb-4">
+            <h6 class="fw-bold small text-secondary text-uppercase ls-1 mb-2">2. 模板数据 (Templates)</h6>
+            <div class="bg-light bg-opacity-50 rounded-3 p-3 border border-secondary border-opacity-10 d-flex align-items-center shadow-sm">
+                <span class="badge bg-secondary me-3">GET</span>
+                <code class="text-dark fw-bold flex-grow-1 text-break" style="font-family: 'SF Mono', monospace;">
+                    {{ url_for('public.api_templates_list', _external=True) }}
+                </code>
+                <button class="btn btn-sm btn-outline-secondary border-0"
+                        onclick="navigator.clipboard.writeText('{{ url_for('public.api_templates_list', _external=True) }}'); alert('地址已复制')"
+                        title="复制接口地址">
+                    <i class="bi bi-clipboard"></i>
+                </button>
+            </div>
         </div>
 
         <h6 class="fw-bold text-secondary small text-uppercase mb-3 ps-1">请求参数 (Query Parameters)</h6>
@@ -137,7 +155,7 @@
             <table class="table table-sm small text-secondary mb-0 bg-white">
                 <thead class="bg-light">
                     <tr>
-                        <th class="ps-3 py-2" style="width: 100px;">参数名</th>
+                        <th class="ps-3 py-2" style="width: 120px;">参数名</th>
                         <th class="py-2" style="width: 80px;">类型</th>
                         <th class="py-2" style="width: 80px;">默认值</th>
                         <th class="py-2">描述</th>
@@ -153,26 +171,8 @@
                     <tr>
                         <td class="ps-3 font-monospace text-dark">per_page</td>
                         <td>Int</td>
-                        <td>100</td>
-                        <td>每页返回数量（最大 1000）。</td>
-                    </tr>
-                    <tr>
-                        <td class="ps-3 font-monospace text-dark">tag</td>
-                        <td>String</td>
-                        <td>-</td>
-                        <td>按标签名称筛选。</td>
-                    </tr>
-                    <tr>
-                        <td class="ps-3 font-monospace text-dark">q</td>
-                        <td>String</td>
-                        <td>-</td>
-                        <td>搜索关键词（匹配标题或 Prompt）。</td>
-                    </tr>
-                    <tr>
-                        <td class="ps-3 font-monospace text-dark">sort</td>
-                        <td>String</td>
-                        <td>date</td>
-                        <td>排序方式：<code>date</code> (时间倒序), <code>hot</code> (热度), <code>random</code> (随机)。</td>
+                        <td>20</td>
+                        <td>每页返回数量（最大 100）。</td>
                     </tr>
                 </tbody>
             </table>
@@ -187,15 +187,22 @@
   "data": [
     {
       "id": 42,
-      "title": "Cyberpunk City",
-      "author": "Admin",
-      "prompt": "neon lights, rain, futuristic city...",
-      "type": "txt2img",
-      "file_path": "/static/uploads/image_123.jpg",
-      "thumbnail_path": "/static/uploads/image_123_thumb.jpg",
-      "tags": ["scifi", "landscape"],
-      "refs": [],
-      "heat_score": 150,
+      "title": "Neon City",
+      "type": "img2img",
+      "file_path": "https://domain.com/static/uploads/uuid.jpg",
+      "refs": [
+         {
+           "position": 0,
+           "is_placeholder": false,
+           "file_path": "https://domain.com/static/uploads/ref1.jpg"
+         },
+         {
+           "position": 1,
+           "is_placeholder": true,
+           "file_path": "{{ '{{userText}}' }}"  // 自动变量替换
+         }
+      ],
+      "tags": ["scifi", "city"],
       "created_at": "2023-10-27T10:00:00"
     }
   ]
@@ -217,12 +224,14 @@
     const toggle = document.getElementById('sensitiveToggle');
 
     if (toggle) {
+        // 读取 Cookie 状态
         const isEnabled = document.cookie.split('; ').find(row => row.startsWith(COOKIE_NAME + '='))?.split('=')[1] === '1';
         toggle.checked = isEnabled;
 
+        // 监听切换
         toggle.addEventListener('change', function() {
             const d = new Date();
-            d.setTime(d.getTime() + (30 * 24 * 60 * 60 * 1000));
+            d.setTime(d.getTime() + (30 * 24 * 60 * 60 * 1000)); // 30天过期
             document.cookie = `${COOKIE_NAME}=${toggle.checked ? '1' : '0'};expires=${d.toUTCString()};path=/`;
             setTimeout(() => window.location.reload(), 300);
         });

@@ -82,10 +82,17 @@ class Image(db.Model):
         # 构造参考图列表
         refs_data = []
         for r in self.refs:
+            # 处理占位符逻辑，如果是占位符，返回特定标记 {{userText}}
+            if r.is_placeholder:
+                final_path = "{{userText}}"
+            else:
+                final_path = _get_full_url(r.file_path) if r.file_path else ""
+
             refs_data.append({
                 "id": r.id,
-                "file_path": _get_full_url(r.file_path) if r.file_path else "",
-                "is_placeholder": r.is_placeholder
+                "file_path": final_path,
+                "is_placeholder": r.is_placeholder,
+                "position": r.position
             })
 
         return {
