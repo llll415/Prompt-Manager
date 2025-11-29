@@ -53,7 +53,8 @@ class DataService:
                         safe_thumb = None
                         if item.get('zip_thumb_path') and item['zip_thumb_path'] in zf.namelist():
                             safe_thumb = secure_filename(os.path.basename(item['zip_thumb_path']))
-                            with zf.open(item['zip_thumb_path']) as src, open(os.path.join(upload_root, safe_thumb), "wb") as dst:
+                            with zf.open(item['zip_thumb_path']) as src, open(os.path.join(upload_root, safe_thumb),
+                                                                              "wb") as dst:
                                 dst.write(src.read())
 
                         web_folder = current_app.config['UPLOAD_FOLDER']
@@ -63,11 +64,13 @@ class DataService:
                             prompt=item.get('prompt', ''),
                             description=item.get('description', ''),
                             type=item.get('type', 'txt2img'),
+                            category=item.get('category', 'gallery'),  # 读取分类
                             file_path=f"/{web_folder}/{safe_name}",
                             thumbnail_path=f"/{web_folder}/{safe_thumb}" if safe_thumb else None,
-                            status='pending',
+                            status='pending',  # 导入后默认为待审核，需管理员确认
                             heat_score=item.get('heat_score', 0)
                         )
+                        # ---------------------------------
 
                         # 3. 处理标签
                         for t in item.get('tags', []):
@@ -77,12 +80,30 @@ class DataService:
 
                         # 4. 处理参考图
                         for ref_path in item.get('refs', []):
-                            if ref_path in zf.namelist():
-                                safe_ref = secure_filename(os.path.basename(ref_path))
-                                with zf.open(ref_path) as src, open(os.path.join(upload_root, safe_ref), "wb") as dst:
-                                    dst.write(src.read())
-                                ref_obj = ReferenceImage(file_path=f"/{web_folder}/{safe_ref}")
-                                img.refs.append(ref_obj)
+                            # 兼容旧版本 JSON
+                            if isinstance(ref_path, str):
+                                if ref_path in zf.namelist():
+                                    safe_ref = secure_filename(os.path.basename(ref_path))
+                                    with zf.open(ref_path) as src, open(os.path.join(upload_root, safe_ref),
+                                                                        "wb") as dst:
+                                        dst.write(src.read())
+                                    ref_obj = ReferenceImage(file_path=f"/{web_folder}/{safe_ref}")
+                                    img.refs.append(ref_obj)
+                            # 兼容新版本 JSON
+                            elif isinstance(ref_path, dict):
+                                if not ref_path.get('is_placeholder') and ref_path.get('file_path'):
+                                    fname = os.path.basename(ref_path['file_path'])
+                                    zip_ref_path = f"images/{fname}"
+
+                                    if zip_ref_path in zf.namelist():
+                                        with zf.open(zip_ref_path) as src, open(os.path.join(upload_root, fname),
+                                                                                "wb") as dst:
+                                            dst.write(src.read())
+                                        ref_obj = ReferenceImage(
+                                            file_path=f"/{web_folder}/{fname}",
+                                            position=ref_path.get('position', 0)
+                                        )
+                                        img.refs.append(ref_obj)
 
                         db.session.add(img)
                         db.session.commit()
