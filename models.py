@@ -1,6 +1,7 @@
 from flask_login import UserMixin
 from datetime import datetime
 from extensions import db
+from flask import request
 
 # 多对多关联表：图片与标签
 image_tags = db.Table('image_tags',
@@ -41,6 +42,16 @@ class Image(db.Model):
 
     def to_dict(self):
         """序列化为字典，用于 API 或导出"""
+
+        def _get_full_url(path):
+            """辅助函数：确保返回的是带域名的完整 URL"""
+            if not path:
+                return None
+            if path.startswith(('http://', 'https://')):
+                return path
+            # 本地路径，拼接当前请求的域名
+            return request.url_root.rstrip('/') + path
+
         return {
             "id": self.id,
             "title": self.title,
@@ -48,10 +59,16 @@ class Image(db.Model):
             "prompt": self.prompt,
             "description": self.description,
             "type": self.type,
-            "file_path": self.file_path,
-            "thumbnail_path": self.thumbnail_path,
+
+            # 主图和缩略图都处理成绝对路径
+            "file_path": _get_full_url(self.file_path),
+            "thumbnail_path": _get_full_url(self.thumbnail_path),
+
             "tags": [t.name for t in self.tags],
-            "refs": [r.file_path for r in self.refs],
+
+            # 参考图列表也处理成绝对路径
+            "refs": [_get_full_url(r.file_path) for r in self.refs],
+
             "heat_score": self.heat_score,
             "created_at": self.created_at.isoformat()
         }
