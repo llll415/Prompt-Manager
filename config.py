@@ -30,7 +30,7 @@ class Config:
     ITEMS_PER_PAGE = int(os.environ.get('ITEMS_PER_PAGE') or 24)
     ADMIN_PER_PAGE = int(os.environ.get('ADMIN_PER_PAGE') or 12)
 
-    # 图片处理参数
+    # 图片处理参数 (本地模式用)
     IMG_MAX_DIMENSION = int(os.environ.get('IMG_MAX_DIMENSION') or 1600)
     IMG_QUALITY = int(os.environ.get('IMG_QUALITY') or 85)
 
@@ -46,3 +46,17 @@ class Config:
 
     # 访客权限控制
     ALLOW_PUBLIC_SENSITIVE_TOGGLE = True
+
+    # --- 存储配置 (通用 S3 支持) ---
+    # 存储模式: local 或 cloud
+    STORAGE_TYPE = os.environ.get('STORAGE_TYPE') or 'local'
+
+    # S3 配置
+    S3_ENDPOINT = os.environ.get('S3_ENDPOINT')
+    S3_ACCESS_KEY = os.environ.get('S3_ACCESS_KEY')
+    S3_SECRET_KEY = os.environ.get('S3_SECRET_KEY')
+    S3_BUCKET = os.environ.get('S3_BUCKET')
+    S3_DOMAIN = os.environ.get('S3_DOMAIN')
+
+    # 云端缩略图处理后缀
+    S3_THUMB_SUFFIX = os.environ.get('S3_THUMB_SUFFIX') or ''
