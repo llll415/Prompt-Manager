@@ -3,27 +3,6 @@
  * 画廊页面核心交互逻辑：详情弹窗、变量解析、交互式Prompt、统计打点。
  */
 
-document.addEventListener("DOMContentLoaded", function() {
-    const savedTheme = localStorage.getItem('theme') || 'light';
-    document.documentElement.setAttribute('data-theme', savedTheme);
-    updateThemeIcon(savedTheme);
-});
-
-// --- Theme Logic ---
-
-function toggleTheme() {
-    const current = document.documentElement.getAttribute('data-theme');
-    const target = current === 'dark' ? 'light' : 'dark';
-    document.documentElement.setAttribute('data-theme', target);
-    localStorage.setItem('theme', target);
-    updateThemeIcon(target);
-}
-
-function updateThemeIcon(theme) {
-    const icon = document.getElementById('themeIcon');
-    if(icon) icon.className = theme === 'dark' ? 'bi bi-sun-fill' : 'bi bi-moon-stars-fill';
-}
-
 // --- Global State for Prompt Variables ---
 window.currentVars = {};
 window.rawPrompt = "";

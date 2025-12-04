@@ -5,7 +5,7 @@
 
 {% block content %}
 <div class="page-container d-flex flex-column align-items-center justify-content-center" style="min-height: 60vh;">
-    <div class="glass-card text-center p-5 animate-up" style="max-width: 500px; width: 100%;">
+    <div class="glass-panel text-center p-5 animate-up" style="max-width: 500px; width: 100%;">
 
         {% if status == 'approved' %}
             <div class="mb-4 d-inline-flex align-items-center justify-content-center rounded-circle bg-primary bg-opacity-10 scale-in-bounce"
@@ -49,7 +49,6 @@
 
 <script>
     function showDetailFromId(id) {
-        // 直接跳转到首页并高亮该作品 (需配合首页逻辑，或此处改为简单的跳转)
         window.location.href = "{{ url_for('public.index') }}?highlight=" + id;
     }
 </script>

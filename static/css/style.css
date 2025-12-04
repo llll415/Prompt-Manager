@@ -772,3 +772,33 @@ h1.art-title, h2.art-title {
 #btnCopyPrompt:active {
     transform: scale(0.96);
 }
+
+/* --- 将 Bootstrap 工具类挂钩到 CSS 变量 --- */
+.text-primary { color: var(--accent-color) !important; }
+.text-secondary { color: var(--text-secondary) !important; }
+
+.bg-light { background-color: var(--btn-bg) !important; }
+
+.bg-primary.bg-opacity-10 { background-color: rgba(0, 113, 227, 0.1) !important; }
+[data-theme="dark"] .bg-primary.bg-opacity-10 { background-color: rgba(41, 151, 255, 0.15) !important; }
+
+.bg-success.bg-opacity-10 { background-color: rgba(52, 199, 89, 0.1) !important; }
+[data-theme="dark"] .bg-success.bg-opacity-10 { background-color: rgba(48, 209, 88, 0.15) !important; }
+
+/* --- 全局边框颜色修正 --- */
+
+:root {
+    --border-color: rgba(0, 0, 0, 0.12);
+}
+
+[data-theme="dark"] {
+    --border-color: rgba(255, 255, 255, 0.12);
+}
+
+.border, .border-top, .border-bottom, .border-start, .border-end {
+    border-color: var(--border-color) !important;
+}
+
+.btn-light {
+    border-color: var(--border-color) !important;
+}
